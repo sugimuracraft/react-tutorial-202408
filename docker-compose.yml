@@ -1,0 +1,11 @@
+services:
+  fromt:
+    build:
+      context: './'
+      dockerfile: './docker/front/Dockerfile'
+    volumes:
+      - '.:/code'
+    ports:
+      - '${BACKEND_EXPOSE_PORT:-15173}:5173'
+    command: 'sleep infinity'
+    # command: 'python main.py'
