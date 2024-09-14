@@ -1,11 +1,36 @@
 services:
-  fromt:
+  db:
+    build:
+      context: ./
+      dockerfile: ./docker/db/Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: superpassword
+    shm_size: 128mb
+    volumes:
+      - "./docker/db/data:/var/lib/postgresql/data"
+      - "./docker/db/initdb.d:/docker-entrypoint-initdb.d"
+  back:
+    depends_on:
+      - db
+    build:
+      context: ./
+      dockerfile: ./docker/back/Dockerfile
+    env_file:
+      - ./back/.env
+    volumes:
+      - './back:/code'
+    ports:
+      - '${BACKEND_EXPOSE_PORT:-18000}:8000'
+    # command: 'sleep infinity'
+    command: 'uvicorn main:app --workers 1 --reload --host 0.0.0.0 --port 8000'
+  front:
     build:
       context: './'
       dockerfile: './docker/front/Dockerfile'
     volumes:
-      - '.:/code'
+      - './front:/code'
     ports:
       - '${BACKEND_EXPOSE_PORT:-15173}:5173'
     command: 'sleep infinity'
-    # command: 'python main.py'
+    # command: 'npm run dev'

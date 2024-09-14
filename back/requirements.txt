@@ -1,0 +1,17 @@
+# common
+alembic
+fastapi
+passlib[bcrypt]
+psycopg2
+pydantic_settings
+python-multipart
+python-jose[cryptography]
+SQLAlchemy
+uvicorn[standard]
+
+# local, test
+black
+factory-boy
+httpx
+pytest
+pytest-mock
