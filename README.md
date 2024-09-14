@@ -5,9 +5,13 @@
 ## Run Debug Server
 
 ```bash
-cd vite-project
-npm run dev
+docker compose build
+docker compose up -d
 ```
+
+* front endpoint: `http://localhost:15173`
+* back endpoint: `http://localhost:18000`
+    * back docs: `http://localhost:18000/docs`
 
 # Initial Setup Project
 
