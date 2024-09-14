@@ -1,33 +1,46 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react';
 import './App.css'
-import RecordForm, { Record } from './record-form/RecordForm'
+import { Settings } from './settings';
+import StudyRecordForm from './study-record/Form'
+import StudyRecordList from './study-record/List'
+
 
 function App() {
-  const [records, setRecords] = useState([
-    { id: "209af90d-f68d-4488-ae1e-31ce79cb8d39", title: "勉強の記録1", time: 1},
-    { id: "f24ae960-8c4c-4c4d-834b-132abcea1579", title: "勉強の記録2", time: 3},
-    { id: "cf7bd3cf-8716-46e5-be23-0d1584e6c6c2", title: "勉強の記録3", time: 5}
-  ])
-  const [totalTime, setTotalTime] = useState(records.reduce((sum, record) => sum + record.time, 0))
+  const [studyRecords, setStudyRecords] = useState({
+    totalCount: 0,
+    studyRecords: [],
+  }); // リストの状態を管理
 
-  const listItems = records.map(record => <li key={record.id}>{record.title}: {record.time} 時間</li>);
+  // 初期表示で保存済みのリストを API から取得
+  useEffect(() => {
+    refreshList()
+  }, [])
 
-  function addRecord(record: Record) {
-    setRecords([...records, record])
-    setTotalTime(totalTime + record.time)
+  function refreshList() {
+    // APIから最新のStudyRecordを取得してリストを更新する
+    fetch(`${Settings.APIEndPoint}/study-records`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok.')
+        }
+        return response.json()
+      })
+      .then(data => setStudyRecords({
+        totalCount: data.total_count,
+        studyRecords: data.study_records,
+      }))
+      .catch(error => console.error('Error fetching study records:', error))
   }
 
   return (
     <>
-      <RecordForm
-        onSubmit={(record) => addRecord(record)}>
-      </RecordForm>
-      <div>
-        <ul>{listItems}</ul>
-      </div>
-      <div>
-        合計時間: {totalTime}
-      </div>
+      <StudyRecordForm
+        onSubmit={() => refreshList()} // Form送信後にリストをリフレッシュ
+      />
+      <StudyRecordList
+        data={studyRecords}
+        onChange={() => refreshList()}
+      />
     </>
   )
 }

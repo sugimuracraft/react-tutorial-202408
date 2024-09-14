@@ -32,5 +32,5 @@ services:
       - './front:/code'
     ports:
       - '${BACKEND_EXPOSE_PORT:-15173}:5173'
-    command: 'sleep infinity'
-    # command: 'npm run dev'
+    # command: 'sleep infinity'
+    command: 'npm run dev'
