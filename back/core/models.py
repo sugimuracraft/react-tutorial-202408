@@ -13,10 +13,11 @@ class Base(DeclarativeBase):
 
 
 class CommonMixin:
-    
+
     @declared_attr.directive
     def __tablename__(cls) -> str:
-        return sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower()
+        # Convert camel case to snake case.
+        return sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()
 
     id: Mapped[Uuid] = mapped_column(Uuid, primary_key=True, default=uuid4)
     created_at: Mapped[datetime] = mapped_column(

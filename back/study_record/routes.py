@@ -8,10 +8,16 @@ from core.database import get_db
 from core.schemas import EmptySchema, ListQuerySchema
 from study_record.crud import create_item, delete_item, get_item, get_list, update_item
 from study_record.models import StudyRecord
-from study_record.schemas import StudyRecordCreationSchema, StudyRecordListSchema, StudyRecordSchema, StudyRecordUpdationSchema
+from study_record.schemas import (
+    StudyRecordCreationSchema,
+    StudyRecordListSchema,
+    StudyRecordSchema,
+    StudyRecordUpdationSchema,
+)
 from study_record.validators import validate_id
 
 router = APIRouter()
+
 
 @router.post("/")
 def register_study_record(
@@ -33,9 +39,10 @@ def list_study_record(
         count=c,
         page=p,
     )
-    total_count, study_records = get_list(session, query_params)
+    total_count, total_time, study_records = get_list(session, query_params)
     return StudyRecordListSchema(
         total_count=total_count,
+        total_time=total_time,
         study_records=study_records,
     )
 
@@ -57,7 +64,7 @@ def modify_study_record(
     session: Session = Depends(get_db),
 ):
     validate_id(session, id)
-    study_record = cast(StudyRecord, update_item(session, id, data))
+    study_record = update_item(session, id, data)
     return StudyRecordSchema.model_validate(study_record)
 
 

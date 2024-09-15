@@ -26,6 +26,16 @@ openssl rand -hex 32
 docker compose up -d
 ```
 
+## DBマイグレーション
+
+最新バージョンをDBに適用する。
+
+```bash
+ORIG_DB_DATABASE=${DB_DATABASE}
+DB_DATABASE=${ORIG_DB_DATABASE}_test alembic upgrade head
+DB_DATABASE=${ORIG_DB_DATABASE} alembic upgrade head
+```
+
 # DBマイグレーション
 
 ## 追加分の作成
