@@ -3,10 +3,11 @@ import { StudyRecord, StudyRecords } from './Types'
 
 interface ListProps {
   data: StudyRecords
+  onEdit: (data: StudyRecord) => void
   onChange: () => void
 }
 
-function StudyRecordList({ data, onChange }: ListProps) {
+function StudyRecordList({ data, onEdit, onChange }: ListProps) {
   const totalTime = data.studyRecords.reduce((sum: number, record: StudyRecord) => sum + record.time, 0)
 
   return (
@@ -17,6 +18,7 @@ function StudyRecordList({ data, onChange }: ListProps) {
           <StudyRecordItem
             key={studyRecord.id}
             data={studyRecord}
+            onEdit={onEdit}
             onChange={() => onChange()}
           />
         ))}

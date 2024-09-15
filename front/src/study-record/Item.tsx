@@ -1,12 +1,14 @@
 import { Settings } from '../settings'
 import { StudyRecord } from './Types'
 
-interface ItemProps {
+type ItemProps = {
   data: StudyRecord
+  onEdit: (data: StudyRecord) => void
   onChange: () => void
 }
 
-function StudyRecordItem({ data, onChange }: ItemProps) {
+function StudyRecordItem({ data, onEdit, onChange }: ItemProps) {
+
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -30,6 +32,7 @@ function StudyRecordItem({ data, onChange }: ItemProps) {
     <li key={data.id}>
       <h2>{data.title}</h2>
       <p>{data.time} 時間</p>
+      <button onClick={() => onEdit(data)}>編集</button>
       <button onClick={handleDelete}>削除</button>
     </li>
   )

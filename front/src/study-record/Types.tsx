@@ -5,6 +5,6 @@ export type StudyRecord = {
 }
 
 export type StudyRecords = {
-  totalCount: number;
+  totalCount: number
   studyRecords: StudyRecord[]
 }

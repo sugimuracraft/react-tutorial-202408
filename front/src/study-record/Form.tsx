@@ -1,21 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Settings } from '../settings'
-
-export type StudyRecord = {
-  id: string
-  title: string
-  time: number
-};
+import { StudyRecord } from './Types'
 
 interface FormProps {
+  initialData?: StudyRecord
   onSubmit: (record: StudyRecord) => void
+  onCancel: () => void
 }
 
-function StudyRecordForm({ onSubmit }: FormProps) {
+function StudyRecordForm({ initialData, onSubmit, onCancel }: FormProps) {
   const [title, setTitle] = useState('')
   const [time, setTime] = useState<number | ''>('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    if (!initialData) {
+      return
+    }
+    setTitle(initialData.title)
+    setTime(initialData.time)
+  }, [initialData])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,19 +31,40 @@ function StudyRecordForm({ onSubmit }: FormProps) {
 
     setLoading(true)
 
-    fetch(
-      `${Settings.APIEndPoint}/study-records`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    let response$
+    if (!initialData) {
+      // creation
+      response$ = fetch(
+        `${Settings.APIEndPoint}/study-records`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: title,
+            time: time,
+          })
         },
-        body: JSON.stringify({
-          title: title,
-          time: time,
-        })
-      },
-    )
+      )
+    }
+    else {
+      // updation
+      response$ = fetch(
+        `${Settings.APIEndPoint}/study-records/${initialData.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: title,
+            time: time,
+          })
+        },
+      )
+    }
+    response$
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok.')
@@ -48,8 +74,8 @@ function StudyRecordForm({ onSubmit }: FormProps) {
     .then((data: StudyRecord) => {
       setMessage('Study record created successfully!')
       // clear forms.
-      setTitle('');
-      setTime('');
+      setTitle('')
+      setTime('')
       setLoading(false)
       onSubmit(data)
     })
@@ -57,6 +83,13 @@ function StudyRecordForm({ onSubmit }: FormProps) {
       setMessage(err.message)
       setLoading(false)
     })
+  }
+
+  const handleCancel = (e: React.FormEvent) => {
+    e.preventDefault()
+    setTitle('')
+    setTime('')
+    onCancel()
   }
 
   return (
@@ -82,9 +115,8 @@ function StudyRecordForm({ onSubmit }: FormProps) {
           ></input>
         </div>
         <div>
-          <button type="submit">
-            保存
-          </button>
+          <button type="submit">{!initialData ? "Create" : "Update"}</button>
+          <button type="button" onClick={handleCancel}>Cancel</button>
         </div>
       </form>
       {loading && <p>Sending...</p>}
